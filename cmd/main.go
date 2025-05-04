@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"log"
 	"os"
 	"time"
@@ -10,14 +10,21 @@ import (
 	"gopkg.in/telebot.v3"
 )
 
-func main() {
+func getBotToken() string {
 
-	err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Проблемы получением токена!")
-    }
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Ошибка загрузки .env файла: ", err)
+	}
 
 	token := os.Getenv("BOT_TOKEN")
+	if token == "" {
+		log.Fatal("Переменная окружения BOT_TOKEN не установлена.")
+	}
+
+	return token
+}
+
+func initBot(token string) *telebot.Bot {
 
 	settings := telebot.Settings{
 		Token:  token,
@@ -26,23 +33,18 @@ func main() {
 
 	bot, err := telebot.NewBot(settings)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Ошибка создания бота: %v", err)
 	}
 
-	bot.Handle("/start", func(c telebot.Context) error {
-		log.Printf("%s: /start\n", c.Sender().FirstName)
-		welcome_msg := fmt.Sprintf("Привет, %s 👋!\nДобро пожаловать в %s .",
-			c.Sender().FirstName, bot.Me.FirstName)
+	return bot
+}
 
-		return c.Send(welcome_msg)
-	})
-	
-	bot.Handle(telebot.OnText, func(c telebot.Context) error {
+func main() {
 
-		msg := c.Text()
-		log.Printf("%s: %s\n", c.Sender().FirstName, msg)
-		return c.Send("Вы написали: " + msg)
-	})
+	token := getBotToken()
+	bot := initBot(token)
+
+	registerHandlers(bot)
 
 	log.Printf("%s started working!", bot.Me.FirstName)
 	bot.Start()
