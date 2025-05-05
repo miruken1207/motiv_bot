@@ -38,7 +38,7 @@ func handleText(c telebot.Context) error {
 	text := c.Text()
 
 	if waitingForQuote[userID] {
-		err := AppendQuote("/home/miruken/Dev/go_dev/motiv_bot/cmd/quotes.txt", text)
+		err := AppendQuote("/Users/abdulaziz/main/motiv_bot/cmd/quotes.txt", text)
 		if err != nil {
 			log.Printf("Ошибка при сохранении цитаты от %s: %v", c.Sender().FirstName, err)
 			return c.Send("Произошла ошибка при сохранении цитаты 😞")
@@ -88,7 +88,11 @@ func GetRandomQuote(path string) string {
 
 func handleGetRandomQuote(c telebot.Context) error {
 
-	quote := GetRandomQuote("/home/miruken/Dev/go_dev/motiv_bot/cmd/quotes.txt")
+	quote := GetRandomQuote("/Users/abdulaziz/main/motiv_bot/cmd/quotes.txt")
+	userName := c.Sender().FirstName
+	userMessage := c.Text()
+	log.Printf("%s: %s", userName, userMessage)
+	
 	return c.Send(quote)
 }
 
