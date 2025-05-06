@@ -1,51 +1,18 @@
 package main
 
 import (
-	// "fmt"
 	"log"
-	"os"
-	"time"
-
-	"github.com/joho/godotenv"
-	"gopkg.in/telebot.v3"
+	bot "motiv_bot/bot"
+	handler "motiv_bot/handlers"
 )
-
-func getBotToken() string {
-
-	if err := godotenv.Load(); err != nil {
-		log.Fatal("Ошибка загрузки .env файла: ", err)
-	}
-
-	token := os.Getenv("BOT_TOKEN")
-	if token == "" {
-		log.Fatal("Переменная окружения BOT_TOKEN не установлена.")
-	}
-
-	return token
-}
-
-func initBot(token string) *telebot.Bot {
-
-	settings := telebot.Settings{
-		Token:  token,
-		Poller: &telebot.LongPoller{Timeout: 10 * time.Second},
-	}
-
-	bot, err := telebot.NewBot(settings)
-	if err != nil {
-		log.Fatalf("Ошибка создания бота: %v", err)
-	}
-
-	return bot
-}
 
 func main() {
 
-	token := getBotToken()
-	bot := initBot(token)
+	token := bot.GetBotToken()
+	bot := bot.InitBot(token)
 
-	registerHandlers(bot)
+	handler.RegisterHandlers(bot)
 
-	log.Printf("%s started working!", bot.Me.FirstName)
+	log.Printf("%s started working!\n\n", bot.Me.FirstName)
 	bot.Start()
 }
